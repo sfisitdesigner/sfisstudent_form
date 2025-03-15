@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Student Data Form</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 0;
+    }
+    .form-container {
+      max-width: 800px;
+      margin: 20px auto;
+      padding: 20px;
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    h1 {
+      text-align: center;
+      color: #333;
+    }
+    .form-group {
+      margin-bottom: 15px;
+    }
+    .form-group label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+      color: #555;
+    }
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 16px;
+    }
+    .form-group input[type="file"] {
+      padding: 5px;
+    }
+    .form-group .form-sub-label {
+      font-size: 12px;
+      color: #777;
+    }
+    .form-group .form-sub-label::before {
+      content: "*";
+      color: red;
+    }
+    .form-group button {
+      padding: 10px 20px;
+      background-color: #28a745;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    .form-group button.reset {
+      background-color: #dc3545;
+    }
+    .form-group button:hover {
+      opacity: 0.9;
+    }
+    .error {
+      color: red;
+      font-size: 14px;
+      margin-top: 5px;
+    }
+    .radio-group {
+      display: flex;
+      gap: 20px;
+    }
+    .radio-group label {
+      font-weight: normal;
+    }
+    .section-title {
+      font-size: 18px;
+      font-weight: bold;
+      color: #333;
+      margin-top: 20px;
+      margin-bottom: 10px;
+      border-bottom: 2px solid #ccc;
+      padding-bottom: 5px;
+    }
+    .cropper-container {
+      max-width: 100%;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="form-container">
+    <h1>ST. FRANCIS INTERNATIONAL SCHOOL</h1>
+    <form id="studentForm" onsubmit="return validateForm()">
+      <!-- Student Information -->
+      <div class="section-title">Student Information</div>
+      <div class="form-group">
+        <label for="firstName">STUDENT FIRST NAME <span class="form-sub-label">(Required)</span></label>
+        <input type="text" id="firstName" name="firstName" placeholder="Enter first name" required onblur="validateText(this)" oninput="this.value = this.value.toUpperCase()">
+      </div>
+      <div class="form-group">
+        <label for="lastName">STUDENT LAST NAME <span class="form-sub-label">(Required)</span></label>
+        <input type="text" id="lastName" name="lastName" placeholder="Enter last name" required onblur="validateText(this)" oninput="this.value = this.value.toUpperCase()">
+      </div>
+      <div class="form-group">
+        <label for="admissionNumber">ADMISSION NUMBER <span class="form-sub-label">(Required)</span></label>
+        <input type="text" id="admissionNumber" name="admissionNumber" placeholder="Enter admission number" required>
+      </div>
+      <div class="form-group">
+        <label for="admissionDate">ADMISSION DATE <span class="form-sub-label">(Optional)</span></label>
+        <input type="date" id="admissionDate" name="admissionDate">
+      </div>
+      <div class="form-group">
+        <label for="motherTongue">MOTHER TONGUE <span class="form-sub-label">(Required)</span></label>
+        <select id="motherTongue" name="motherTongue" required>
+          <option value="">Select Mother Tongue</option>
+          <option value="Assamese">Assamese</option>
+          <option value="Bengali">Bengali</option>
+          <option value="Bodo">Bodo</option>
+          <option value="Dogri">Dogri</option>
+          <option value="Gujarati">Gujarati</option>
+          <option value="Hindi">Hindi</option>
+          <option value="Kannada">Kannada</option>
+          <option value="Kashmiri">Kashmiri</option>
+          <option value="Konkani">Konkani</option>
+          <option value="Maithili">Maithili</option>
+          <option value="Malayalam">Malayalam</option>
+          <option value="Manipuri">Manipuri</option>
+          <option value="Marathi">Marathi</option>
+          <option value="Nepali">Nepali</option>
+          <option value="Odia">Odia</option>
+          <option value="Punjabi">Punjabi</option>
+          <option value="Sanskrit">Sanskrit</option>
+          <option value="Santali">Santali</option>
+          <option value="Sindhi">Sindhi</option>
+          <option value="Tamil">Tamil</option>
+          <option value="Telugu">Telugu</option>
+          <option value="Urdu">Urdu</option>
+          <option value="English">English</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="gender">GENDER <span class="form-sub-label">(Required)</span></label>
+        <select id="gender" name="gender" required>
+          <option value="">Select Gender</option>
+          <option value="MALE">MALE</option>
+          <option value="FEMALE">FEMALE</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="grade">GRADE <span class="form-sub-label">(Required)</span></label>
+        <select id="grade" name="grade" required onchange="validateDOB()">
+          <option value="">Select Grade</option>
+          <option value="PRE KG">PRE KG</option>
+          <option value="JUNIOR KG">JUNIOR KG</option>
+          <option value="SENIOR KG">SENIOR KG</option>
+          <option value="GRADE 1">GRADE 1</option>
+          <option value="GRADE 2">GRADE 2</option>
+          <option value="GRADE 3">GRADE 3</option>
+          <option value="GRADE 4">GRADE 4</option>
+          <option value="GRADE 5">GRADE 5</option>
+          <option value="GRADE 6">GRADE 6</option>
+          <option value="GRADE 7">GRADE 7</option>
+          <option value="GRADE 8">GRADE 8</option>
+          <option value="GRADE 9">GRADE 9</option>
+          <option value="GRADE 10">GRADE 10</option>
+          <option value="GRADE 11">GRADE 11</option>
+          <option value="GRADE 12">GRADE 12</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="dob">DATE OF BIRTH <span class="form-sub-label">(Required)</span></label>
+        <input type="date" id="dob" name="dob" required onblur="validateDOB()">
+      </div>
+      <div class="form-group">
+        <label for="aadhaar">AADHAAR NUMBER <span class="form-sub-label">(Required, 12 digits)</span></label>
+        <input type="text" id="aadhaar" name="aadhaar" placeholder="Enter Aadhaar number" required onblur="validateNumeric(this, 12)">
+      </div>
+	 <!-- Community and Nationality -->
+      <div class="form-group">
+        <label for="community">COMMUNITY <span class="form-sub-label">(Required)</span></label>
+        <select id="community" name="community" required onchange="toggleCommunityCertificate()">
+          <option value="">Select Community</option>
+          <option value="GENDRAL">GENDRAL</option>
+          <option value="BC">BC</option>
+          <option value="MBC">MBC</option>
+          <option value="SC">SC</option>
+          <option value="ST">ST</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="nationality">NATIONALITY <span class="form-sub-label">(Required)</span></label>
+        <select id="nationality" name="nationality" required>
+          <option value="">Select Nationality</option>
+          <option value="Indian">Indian</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+          <!-- Guardian or Parent Details -->
+      <div class="section-title">Guardian or Parent Details</div>
+      <div class="form-group">
+        <label>GUARDIAN OR PARENT <span class="form-sub-label">(Required)</span></label>
+        <div class="radio-group">
+          <label><input type="radio" name="guardianOrParent" value="parent" checked onchange="toggleGuardianParentDetails()"> Parent</label>
+          <label><input type="radio" name="guardianOrParent" value="guardian" onchange="toggleGuardianParentDetails()"> Guardian</label>
+        </div>
+      </div>
+
+      <!-- Parent Details -->
+      <div id="parentDetails">
+        <div class="form-group">
+          <label for="fatherName">FATHER'S NAME <span class="form-sub-label">(Required)</span></label>
+          <input type="text" id="fatherName" name="fatherName" placeholder="Enter father's name" required onblur="validateText(this)" oninput="this.value = this.value.toUpperCase()">
+        </div>
+        <div class="form-group">
+          <label for="fatherAadhaar">FATHER'S AADHAAR NUMBER <span class="form-sub-label">(Required, 12 digits)</span></label>
+          <input type="text" id="fatherAadhaar" name="fatherAadhaar" placeholder="Enter Aadhaar number" required onblur="validateNumeric(this, 12)">
+        </div>
+        <div class="form-group">
+          <label for="fatherOccupation">FATHER'S OCCUPATION <span class="form-sub-label">(Required)</span></label>
+          <select id="fatherOccupation" name="fatherOccupation" required>
+            <option value="">Select Occupation</option>
+            <option value="Business">Business</option>
+            <option value="Government Employee">Government Employee</option>
+            <option value="Private Employee">Private Employee</option>
+            <option value="Doctor">Doctor</option>
+            <option value="Engineer">Engineer</option>
+            <option value="Teacher">Teacher</option>
+            <option value="Farmer">Farmer</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="fatherDesignation">FATHER'S DESIGNATION <span class="form-sub-label">(Required)</span></label>
+          <select id="fatherDesignation" name="fatherDesignation" required>
+            <option value="">Select Designation</option>
+            <option value="Manager">Manager</option>
+            <option value="Engineer">Engineer</option>
+            <option value="Teacher">Teacher</option>
+            <option value="Doctor">Doctor</option>
+            <option value="Farmer">Farmer</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="fatherIncome">FATHER'S ANNUAL INCOME <span class="form-sub-label">(Required)</span></label>
+          <select id="fatherIncome" name="fatherIncome" required>
+            <option value="">Select Income Range</option>
+            <option value="₹100,000 - ₹200,000">₹100,000 - ₹200,000</option>
+            <option value="₹200,000 - ₹500,000">₹200,000 - ₹500,000</option>
+            <option value="₹500,000 - ₹700,000">₹500,000 - ₹700,000</option>
+            <option value="₹700,000 - ₹1,000,000">₹700,000 - ₹1,000,000</option>
+            <option value="Above ₹1,000,000">Above ₹1,000,000</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="fatherEmail">FATHER'S EMAIL ID <span class="form-sub-label">(Required)</span></label>
+          <input type="email" id="fatherEmail" name="fatherEmail" placeholder="Enter email" required oninput="this.value = this.value.toLowerCase()">
+        </div>
+        <div class="form-group">
+          <label for="fatherPhone">FATHER'S PHONE NUMBER <span class="form-sub-label">(Required, 10 digits)</span></label>
+          <input type="text" id="fatherPhone" name="fatherPhone" placeholder="Enter phone number" required onblur="validateNumeric(this, 10)">
+        </div>
+
+        <div class="form-group">
+          <label for="motherName">MOTHER'S NAME <span class="form-sub-label">(Required)</span></label>
+          <input type="text" id="motherName" name="motherName" placeholder="Enter mother's name" required onblur="validateText(this)" oninput="this.value = this.value.toUpperCase()">
+        </div>
+        <div class="form-group">
+          <label for="motherAadhaar">MOTHER'S AADHAAR NUMBER <span class="form-sub-label">(Required, 12 digits)</span></label>
+          <input type="text" id="motherAadhaar" name="motherAadhaar" placeholder="Enter Aadhaar number" required onblur="validateNumeric(this, 12)">
+        </div>
+        <div class="form-group">
+          <label for="motherOccupation">MOTHER'S OCCUPATION <span class="form-sub-label">(Required)</span></label>
+          <select id="motherOccupation" name="motherOccupation" required onchange="toggleMotherFields()">
+            <option value="">Select Occupation</option>
+            <option value="Homemaker">Homemaker</option>
+            <option value="Government Employee">Government Employee</option>
+            <option value="Private Employee">Private Employee</option>
+            <option value="Doctor">Doctor</option>
+            <option value="Teacher">Teacher</option>
+            <option value="Engineer">Engineer</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="motherDesignation">MOTHER'S DESIGNATION <span class="form-sub-label">(Required)</span></label>
+          <select id="motherDesignation" name="motherDesignation" required>
+            <option value="">Select Designation</option>
+            <option value="Manager">Manager</option>
+            <option value="Engineer">Engineer</option>
+            <option value="Teacher">Teacher</option>
+            <option value="Doctor">Doctor</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="motherIncome">MOTHER'S ANNUAL INCOME <span class="form-sub-label">(Required)</span></label>
+          <select id="motherIncome" name="motherIncome" required>
+            <option value="">Select Income Range</option>
+            <option value="₹100,000 - ₹200,000">₹100,000 - ₹200,000</option>
+            <option value="₹200,000 - ₹500,000">₹200,000 - ₹500,000</option>
+            <option value="₹500,000 - ₹700,000">₹500,000 - ₹700,000</option>
+            <option value="₹700,000 - ₹1,000,000">₹700,000 - ₹1,000,000</option>
+            <option value="Above ₹1,000,000">Above ₹1,000,000</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="motherEmail">MOTHER'S EMAIL ID <span class="form-sub-label">(Required)</span></label>
+          <input type="email" id="motherEmail" name="motherEmail" placeholder="Enter email" required oninput="this.value = this.value.toLowerCase()">
+        </div>
+        <div class="form-group">
+          <label for="motherPhone">MOTHER'S PHONE NUMBER <span class="form-sub-label">(Required, 10 digits)</span></label>
+          <input type="text" id="motherPhone" name="motherPhone" placeholder="Enter phone number" required onblur="validateNumeric(this, 10)">
+        </div>
+      </div>
+
+      <!-- Guardian Details -->
+      <div id="guardianDetails" style="display: none;">
+        <div class="form-group">
+          <label for="guardianName">GUARDIAN'S NAME <span class="form-sub-label">(Required)</span></label>
+          <input type="text" id="guardianName" name="guardianName" placeholder="Enter guardian's name" required onblur="validateText(this)" oninput="this.value = this.value.toUpperCase()">
+        </div>
+        <div class="form-group">
+          <label for="guardianAadhaar">GUARDIAN'S AADHAAR NUMBER <span class="form-sub-label">(Required, 12 digits)</span></label>
+          <input type="text" id="guardianAadhaar" name="guardianAadhaar" placeholder="Enter Aadhaar number" required onblur="validateNumeric(this, 12)">
+        </div>
+        <div class="form-group">
+          <label for="guardianOccupation">GUARDIAN'S OCCUPATION <span class="form-sub-label">(Required)</span></label>
+          <select id="guardianOccupation" name="guardianOccupation" required>
+            <option value="">Select Occupation</option>
+            <option value="Business">Business</option>
+            <option value="Government Employee">Government Employee</option>
+            <option value="Private Employee">Private Employee</option>
+            <option value="Doctor">Doctor</option>
+            <option value="Engineer">Engineer</option>
+            <option value="Teacher">Teacher</option>
+            <option value="Farmer">Farmer</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="guardianDesignation">GUARDIAN'S DESIGNATION <span class="form-sub-label">(Required)</span></label>
+          <select id="guardianDesignation" name="guardianDesignation" required>
+            <option value="">Select Designation</option>
+            <option value="Manager">Manager</option>
+            <option value="Engineer">Engineer</option>
+            <option value="Teacher">Teacher</option>
+            <option value="Doctor">Doctor</option>
+            <option value="Farmer">Farmer</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="guardianIncome">GUARDIAN'S ANNUAL INCOME <span class="form-sub-label">(Required)</span></label>
+          <select id="guardianIncome" name="guardianIncome" required>
+            <option value="">Select Income Range</option>
+            <option value="₹100,000 - ₹200,000">₹100,000 - ₹200,000</option>
+            <option value="₹200,000 - ₹500,000">₹200,000 - ₹500,000</option>
+            <option value="₹500,000 - ₹700,000">₹500,000 - ₹700,000</option>
+            <option value="₹700,000 - ₹1,000,000">₹700,000 - ₹1,000,000</option>
+            <option value="Above ₹1,000,000">Above ₹1,000,000</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="guardianEmail">GUARDIAN'S EMAIL ID <span class="form-sub-label">(Required)</span></label>
+          <input type="email" id="guardianEmail" name="guardianEmail" placeholder="Enter email" required oninput="this.value = this.value.toLowerCase()">
+        </div>
+        <div class="form-group">
+          <label for="guardianPhone">GUARDIAN'S PHONE NUMBER <span class="form-sub-label">(Required, 10 digits)</span></label>
+          <input type="text" id="guardianPhone" name="guardianPhone" placeholder="Enter phone number" required onblur="validateNumeric(this, 10)">
+        </div>
+      </div>
+
+      <!-- Address Fields -->
+      <div class="section-title">Address Details</div>
+      <div class="form-group">
+        <label for="address">ADDRESS <span class="form-sub-label">(Required)</span></label>
+        <textarea id="address" name="address" rows="3" placeholder="Enter address" required></textarea>
+      </div>
+      <div class="form-group">
+        <label for="city">CITY <span class="form-sub-label">(Required)</span></label>
+        <input type="text" id="city" name="city" placeholder="Enter city" required>
+      </div>
+      <div class="form-group">
+        <label for="district">DISTRICT <span class="form-sub-label">(Required)</span></label>
+        <select id="district" name="district" required>
+          <option value="">Select District</option>
+          <option value="Ariyalur">Ariyalur</option>
+          <option value="Chennai">Chennai</option>
+          <option value="Coimbatore">Coimbatore</option>
+          <option value="Cuddalore">Cuddalore</option>
+          <option value="Dharmapuri">Dharmapuri</option>
+          <option value="Dindigul">Dindigul</option>
+          <option value="Erode">Erode</option>
+          <option value="Kanchipuram">Kanchipuram</option>
+          <option value="Kanyakumari">Kanyakumari</option>
+          <option value="Karur">Karur</option>
+          <option value="Krishnagiri">Krishnagiri</option>
+          <option value="Madurai">Madurai</option>
+          <option value="Nagapattinam">Nagapattinam</option>
+          <option value="Namakkal">Namakkal</option>
+          <option value="Nilgiris">Nilgiris</option>
+          <option value="Perambalur">Perambalur</option>
+          <option value="Pudukkottai">Pudukkottai</option>
+          <option value="Ramanathapuram">Ramanathapuram</option>
+          <option value="Salem">Salem</option>
+          <option value="Sivaganga">Sivaganga</option>
+          <option value="Thanjavur">Thanjavur</option>
+          <option value="Theni">Theni</option>
+          <option value="Thoothukudi">Thoothukudi</option>
+          <option value="Tiruchirappalli">Tiruchirappalli</option>
+          <option value="Tirunelveli">Tirunelveli</option>
+          <option value="Tiruppur">Tiruppur</option>
+          <option value="Tiruvallur">Tiruvallur</option>
+          <option value="Tiruvannamalai">Tiruvannamalai</option>
+          <option value="Tiruvarur">Tiruvarur</option>
+          <option value="Vellore">Vellore</option>
+          <option value="Viluppuram">Viluppuram</option>
+          <option value="Virudhunagar">Virudhunagar</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="pincode">PIN CODE <span class="form-sub-label">(Required, 6 digits)</span></label>
+        <input type="text" id="pincode" name="pincode" placeholder="Enter pin code" required onblur="validateNumeric(this, 6)">
+      </div>
+
+      <!-- File Uploads -->
+      <div class="section-title">File Uploads</div>
+      <div class="form-group">
+        <label for="aadhaarUpload">UPLOAD STUDENT'S AADHAAR <span class="form-sub-label">(Required, PDF/Image)</span></label>
+        <input type="file" id="aadhaarUpload" name="aadhaarUpload" accept=".pdf,.jpg,.jpeg,.png" required onchange="validateFileSize(this, 'AADH')">
+      </div>
+      <div class="form-group">
+        <label for="birthCertificate">UPLOAD STUDENT'S BIRTH CERTIFICATE <span class="form-sub-label">(Required, PDF/Image)</span></label>
+        <input type="file" id="birthCertificate" name="birthCertificate" accept=".pdf,.jpg,.jpeg,.png" required onchange="validateFileSize(this, 'BRC')">
+      </div>
+      <div class="form-group">
+        <label for="communityCertificate">UPLOAD COMMUNITY CERTIFICATE <span class="form-sub-label">(Required for non-GENDRAL)</span></label>
+        <input type="file" id="communityCertificate" name="communityCertificate" accept=".pdf,.jpg,.jpeg,.png" onchange="validateFileSize(this, 'COMC')">
+      </div>
+      <div class="form-group">
+        <label for="bankPassbook">UPLOAD BANK PASSBOOK <span class="form-sub-label">(Optional)</span></label>
+        <input type="file" id="bankPassbook" name="bankPassbook" accept=".pdf,.jpg,.jpeg,.png" onchange="validateFileSize(this, 'BANK')">
+      </div>
+
+      <!-- Submit and Reset Buttons -->
+      <div class="form-group">
+        <button type="submit">Submit</button>
+        <button type="reset" class="reset">Reset</button>
+      </div>
+    </form>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
+  <script>
+    // Age limits for each grade
+    const gradeAgeLimits = {
+      "PRE KG": { min: { years: 3, months: 6 }, max: { years: 4, months: 5 } },
+      "JUNIOR KG": { min: { years: 4, months: 6 }, max: { years: 5, months: 5 } },
+      "SENIOR KG": { min: { years: 5, months: 6 }, max: { years: 6, months: 5 } },
+      "GRADE 1": { min: { years: 6, months: 6 }, max: { years: 7, months: 5 } },
+      "GRADE 2": { min: { years: 7, months: 6 }, max: { years: 8, months: 5 } },
+      "GRADE 3": { min: { years: 8, months: 6 }, max: { years: 9, months: 5 } },
+      "GRADE 4": { min: { years: 9, months: 6 }, max: { years: 10, months: 5 } },
+      "GRADE 5": { min: { years: 10, months: 6 }, max: { years: 11, months: 5 } },
+      "GRADE 6": { min: { years: 11, months: 6 }, max: { years: 12, months: 5 } },
+      "GRADE 7": { min: { years: 12, months: 6 }, max: { years: 13, months: 5 } },
+      "GRADE 8": { min: { years: 13, months: 6 }, max: { years: 14, months: 5 } },
+      "GRADE 9": { min: { years: 14, months: 6 }, max: { years: 15, months: 5 } },
+      "GRADE 10": { min: { years: 15, months: 6 }, max: { years: 16, months: 5 } },
+      "GRADE 11": { min: { years: 16, months: 6 }, max: { years: 17, months: 5 } },
+      "GRADE 12": { min: { years: 17, months: 6 }, max: { years: 18, months: 5 } },
+    };
+
+    // Validate text fields (no numbers allowed)
+    function validateText(field) {
+      const value = field.value.trim();
+      if (/[^a-zA-Z\s]/.test(value)) {
+        alert("Only text is allowed in this field.");
+        field.value = "";
+        field.focus();
+      }
+    }
+
+    // Validate numeric fields (only numbers allowed)
+    function validateNumeric(field, length) {
+      const value = field.value.trim();
+      if (isNaN(value) || (length && value.length !== length)) {
+        alert(`This field must contain exactly ${length} digits.`);
+        field.value = "";
+        field.focus();
+      }
+    }
+
+    // Validate DOB based on selected grade
+    function validateDOB() {
+      const grade = document.getElementById("grade").value;
+      const dob = document.getElementById("dob").value;
+      if (!grade || !dob) return;
+
+      const dobDate = new Date(dob);
+      const today = new Date();
+      const ageInMilliseconds = today - dobDate;
+      const ageInYears = ageInMilliseconds / (1000 * 60 * 60 * 24 * 365.25);
+
+      const { min, max } = gradeAgeLimits[grade];
+      const minAge = min.years + min.months / 12;
+      const maxAge = max.years + max.months / 12;
+
+      if (ageInYears < minAge || ageInYears > maxAge) {
+        alert(`For ${grade}, the student's age must be between ${min.years} years ${min.months} months and ${max.years} years ${max.months} months.`);
+        document.getElementById("dob").value = "";
+      }
+    }
+
+    // Toggle community certificate upload field
+    function toggleCommunityCertificate() {
+      const community = document.getElementById("community").value;
+      const communityCertificateField = document.getElementById("communityCertificate");
+      if (community === "GENDRAL") {
+        communityCertificateField.disabled = true;
+        communityCertificateField.required = false;
+      } else {
+        communityCertificateField.disabled = false;
+        communityCertificateField.required = true;
+      }
+    }
+
+    // Toggle mother's designation and income fields if occupation is "Homemaker"
+    function toggleMotherFields() {
+      const motherOccupation = document.getElementById("motherOccupation").value;
+      const motherDesignation = document.getElementById("motherDesignation");
+      const motherIncome = document.getElementById("motherIncome");
+
+      if (motherOccupation === "Homemaker") {
+        motherDesignation.disabled = true;
+        motherIncome.disabled = true;
+      } else {
+        motherDesignation.disabled = false;
+        motherIncome.disabled = false;
+      }
+    }
+
+    // Toggle between parent and guardian details
+    function toggleGuardianParentDetails() {
+      const guardianOrParent = document.querySelector('input[name="guardianOrParent"]:checked').value;
+      const parentDetails = document.getElementById("parentDetails");
+      const guardianDetails = document.getElementById("guardianDetails");
+
+      if (guardianOrParent === "parent") {
+        parentDetails.style.display = "block";
+        guardianDetails.style.display = "none";
+      } else {
+        parentDetails.style.display = "none";
+        guardianDetails.style.display = "block";
+      }
+    }
+
+    // Validate file size and type
+    function validateFileSize(fileInput, fileType) {
+      const file = fileInput.files[0];
+      if (!file) return;
+
+      const maxSize = file.type === "application/pdf" ? 300 * 1024 : 100 * 1024; // 300 KB for PDF, 100 KB for images
+      if (file.size > maxSize) {
+        alert(`File size must be less than ${maxSize / 1024} KB.`);
+        fileInput.value = "";
+        return;
+      }
+
+      // Rename the file
+      const fileName = `${document.getElementById("firstName").value}_${fileType}.${file.name.split('.').pop()}`;
+      const renamedFile = new File([file], fileName, { type: file.type });
+      const dataTransfer = new DataTransfer();
+      dataTransfer.items.add(renamedFile);
+      fileInput.files = dataTransfer.files;
+    }
+
+    // Initialize Cropper.js for student photo
+    const studentPhotoInput = document.getElementById("studentPhoto");
+    const cropperImage = document.getElementById("cropperImage");
+    let cropper;
+
+    studentPhotoInput.addEventListener("change", function (e) {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          cropperImage.src = e.target.result;
+          cropperImage.style.display = "block";
+
+          if (cropper) {
+            cropper.destroy();
+          }
+          cropper = new Cropper(cropperImage, {
+            aspectRatio: 1, // Square crop
+            viewMode: 1,
+          });
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    // Validate the entire form
+    function validateForm() {
+      const aadhaar = document.getElementById('aadhaar').value;
+      const aadhaarUpload = document.getElementById('aadhaarUpload').files[0];
+      const birthCertificate = document.getElementById('birthCertificate').files[0];
+
+      // Validate Aadhaar number (12 digits)
+      if (aadhaar.length !== 12 || isNaN(aadhaar)) {
+        alert("Aadhaar number must be 12 digits.");
+        return false;
+      }
+
+      // Validate file uploads
+      if (!aadhaarUpload || !birthCertificate) {
+        alert("Please upload all required documents.");
+        return false;
+      }
+
+      // Validate file types
+      const allowedTypes = ["application/pdf", "image/jpeg", "image/png"];
+      if (!allowedTypes.includes(aadhaarUpload.type) || !allowedTypes.includes(birthCertificate.type)) {
+        alert("Only PDF, JPG, and PNG files are allowed.");
+        return false;
+      }
+
+      alert("Form submitted successfully!");
+      return true;
+    }
+  </script>
+  <!-- Link to the external JavaScript file -->
+  <script src="script.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
+  <script>
+    // Initialize Cropper.js for student photo
+    const studentPhotoInput = document.getElementById("studentPhoto");
+    const cropperImage = document.getElementById("cropperImage");
+    const cropButton = document.getElementById("cropButton");
+    const croppedPreview = document.getElementById("croppedPreview");
+    const croppedImage = document.getElementById("croppedImage");
+    let cropper;
+
+    studentPhotoInput.addEventListener("change", function (e) {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          cropperImage.src = e.target.result;
+          cropperImage.style.display = "block";
+
+          if (cropper) {
+            cropper.destroy();
+          }
+          cropper = new Cropper(cropperImage, {
+            aspectRatio: 1, // Square crop
+            viewMode: 1,
+          });
+
+          // Show the crop button
+          cropButton.style.display = "block";
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    // Handle the crop button click
+    cropButton.addEventListener("click", function () {
+      if (cropper) {
+        const croppedCanvas = cropper.getCroppedCanvas();
+        if (croppedCanvas) {
+          croppedImage.src = croppedCanvas.toDataURL();
+          croppedPreview.style.display = "block";
+        }
+      }
+    });
+
+    // Reset the form
+    document.querySelector("button.reset").addEventListener("click", function () {
+      if (cropper) {
+        cropper.destroy();
+        cropper = null;
+      }
+      cropperImage.src = "";
+      cropperImage.style.display = "none";
+      cropButton.style.display = "none";
+      croppedPreview.style.display = "none";
+      croppedImage.src = "";
+    });
+
+    // Validate the entire form
+    function validateForm() {
+      // Add your form validation logic here
+      alert("Form submitted successfully!");
+      return true;
+    }
+<form id="studentForm" onsubmit="return validateForm()">
+</form>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
+  <script>
+    const webAppUrl = 'https://script.google.com/macros/s/AKfycbwjRu0DJX-FgqqQbFiLXcZ7HO-Meak1aTlHEoYjLj5cxnd8xx09XXCK4LoLvXxQ__89/exec'; // Replace with your Web App URL
+
+    // Function to convert file to Base64
+    function toBase64(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = (error) => reject(error);
+      });
+    }
+
+    // Function to submit form data
+    async function submitForm(event) {
+      event.preventDefault();
+
+      // Validate form fields
+      const aadhaar = document.getElementById('aadhaar').value;
+      const aadhaarUpload = document.getElementById('aadhaarUpload').files[0];
+      const birthCertificate = document.getElementById('birthCertificate').files[0];
+
+      if (aadhaar.length !== 12 || isNaN(aadhaar)) {
+        alert("Aadhaar number must be 12 digits.");
+        return;
+      }
+
+      if (!aadhaarUpload || !birthCertificate) {
+        alert("Please upload all required documents.");
+        return;
+      }
+
+      const allowedTypes = ["application/pdf", "image/jpeg", "image/png"];
+      if (!allowedTypes.includes(aadhaarUpload.type) || !allowedTypes.includes(birthCertificate.type)) {
+        alert("Only PDF, JPG, and PNG files are allowed.");
+        return;
+      }
+
+      // Prepare form data
+      const formData = new FormData(event.target);
+      const data = {};
+      for (const [key, value] of formData.entries()) {
+        data[key] = value;
+      }
+
+      // Handle file uploads
+      const files = {};
+      const fileInputs = ['aadhaarUpload', 'birthCertificate', 'communityCertificate', 'bankPassbook'];
+      for (const inputId of fileInputs) {
+        const fileInput = document.getElementById(inputId);
+        if (fileInput.files.length > 0) {
+          const file = fileInput.files[0];
+          const base64 = await toBase64(file);
+          files[inputId.replace('Upload', '')] = {
+            fileName: file.name,
+            mimeType: file.type,
+            base64: base64.split(',')[1], // Remove the data URL prefix
+          };
+        }
+      }
+      data.files = files;
+
+      // Submit data to Google Apps Script
+      const xhr = new XMLHttpRequest();
+      xhr.open('POST', webAppUrl, true);
+      xhr.setRequestHeader('Content-Type', 'application/json');
+      xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4) {
+          if (xhr.status === 200) {
+            const result = JSON.parse(xhr.responseText);
+            if (result.success) {
+              alert('Form submitted successfully!');
+            } else {
+              alert('Error: ' + result.message);
+            }
+          } else {
+            alert('Error submitting form. Please check the console for details.');
+          }
+        }
+      };
+      xhr.send(JSON.stringify(data));
+    }
+
+    // Attach form submission handler
+    document.getElementById('studentForm').addEventListener('submit', submitForm);
+  </script>
+</body>
+</html>
