@@ -1,0 +1,99 @@
+function doPost(e) {
+  try {
+    // Log incoming data for debugging
+    console.log("Incoming request:", JSON.stringify(e));
+
+    // Parse incoming data
+    if (!e || !e.postData || !e.postData.contents) {
+      throw new Error("Invalid request: No data received.");
+    }
+
+    const data = JSON.parse(e.postData.contents);
+    console.log("Received data:", JSON.stringify(data));
+
+    // Folder IDs for file uploads
+    const folderIds = {
+      aadhaar: '1lE4H0oYigexF_go62gbualzt7a1SgVlD',
+      birthCertificate: '16KGRl3dzBl47JC-c5iNllu7ibzPyd2hs',
+      communityCertificate: '1U7pIXZAlR_GVNvaC4Z3xJV3Bk5myxXYx',
+      bankPassbook: '1R8oa873veqfdOsd4Anl-U0Lve6ecsLcv',
+    };
+
+    // Save uploaded files to Google Drive
+    const fileUrls = {};
+    for (const key in data.files) {
+      const folderId = folderIds[key];
+      if (!folderId) {
+        throw new Error(`Folder ID not found for key: ${key}`);
+      }
+
+      const fileData = data.files[key];
+      const fileBlob = Utilities.newBlob(
+        Utilities.base64Decode(fileData.base64),
+        fileData.mimeType,
+        fileData.fileName
+      );
+
+      const folder = DriveApp.getFolderById(folderId);
+      const file = folder.createFile(fileBlob);
+      fileUrls[key] = file.getUrl();
+      console.log(`File uploaded: ${file.getUrl()}`);
+    }
+
+    // Save form data to Google Sheets
+    const sheet = SpreadsheetApp.openById('1OHu8gt-5PtVRujYMOWFRot_9CkKQj_FnnB8EaZCnl3A').getActiveSheet();
+    const row = [
+      new Date(),
+      data.firstName,
+      data.lastName,
+      data.admissionNumber,
+      data.admissionDate,
+      data.motherTongue,
+      data.gender,
+      data.grade,
+      data.dob,
+      data.aadhaar,
+      data.fatherName || '',
+      data.fatherAadhaar || '',
+      data.fatherOccupation || '',
+      data.fatherDesignation || '',
+      data.fatherIncome || '',
+      data.fatherEmail || '',
+      data.fatherPhone || '',
+      data.motherName || '',
+      data.motherAadhaar || '',
+      data.motherOccupation || '',
+      data.motherDesignation || '',
+      data.motherIncome || '',
+      data.motherEmail || '',
+      data.motherPhone || '',
+      data.guardianName || '',
+      data.guardianAadhaar || '',
+      data.guardianOccupation || '',
+      data.guardianDesignation || '',
+      data.guardianIncome || '',
+      data.guardianEmail || '',
+      data.guardianPhone || '',
+      data.address,
+      data.city,
+      data.district,
+      data.pincode,
+      fileUrls.aadhaar || '',
+      fileUrls.birthCertificate || '',
+      fileUrls.communityCertificate || '',
+      fileUrls.bankPassbook || '',
+    ];
+    sheet.appendRow(row);
+    console.log("Data saved to Google Sheets");
+
+    // Return success response
+    return ContentService.createTextOutput(JSON.stringify({ success: true, message: 'Form submitted successfully!' })).setMimeType(
+      ContentService.MimeType.JSON
+    );
+  } catch (error) {
+    console.error("Error:", error.toString(), error.stack);
+    return ContentService.createTextOutput(JSON.stringify({ success: false, message: error.message })).setMimeType(
+      ContentService.MimeType.JSON
+    );
+  }
+}
